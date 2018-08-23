@@ -1,0 +1,171 @@
+<div class="layui-card">
+    <div class="layui-card-header">
+        <h2 class="header-title">接口管理</h2>
+        <span class="layui-breadcrumb pull-right">
+          <a href="#!home_console">首页</a>
+          <a><cite>接口管理</cite></a>
+        </span>
+    </div>
+    <div class="layui-card-body">
+        <div class="layui-form toolbar">
+            搜索：<input id="function-edit-search" class="layui-input search-input" type="text" placeholder="输入关键字"/>&emsp;
+            <button id="function-btn-search" class="layui-btn icon-btn"><i class="layui-icon">&#xe615;</i>搜索</button>
+            <button id="function-btn-add" class="layui-btn icon-btn"><i class="layui-icon">&#xe654;</i>添加</button>
+        </div>
+
+        <!-- 数据表格 -->
+        <table class="layui-table" id="function-table" lay-filter="role-table"></table>
+    </div>
+</div>
+
+<!-- 表单弹窗 -->
+<script type="text/html" id="function-model">
+    <div style="padding: 20px 20px 20px 20px;">
+        <form id="function-form" lay-filter="function-form" class="layui-form layui-form-pane" action="">
+            <div class="layui-form-item">
+                <label class="layui-form-label">接口名称</label>
+                <div class="layui-input-block">
+                    <input name="functionName" autocomplete="off" placeholder="请输入接口名称" class="layui-input" type="text">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">说明</label>
+                <div class="layui-input-block">
+                    <input name="description" autocomplete="off" placeholder="请输入接口名称" class="layui-input" type="text">
+                </div>
+            </div>
+
+            <div class="layui-tab layui-tab-card">
+                <ul class="layui-tab-title">
+                    <li class="layui-this">Import</li>
+                    <li>Export</li>
+                    <li>Tables</li>
+                </ul>
+                <div class="layui-tab-content" style="height: 100px;">
+                    <div class="layui-tab-item layui-show">
+                        <table class="layui-table" id="importParam-table" lay-filter="role-table"></table>
+                    </div>
+                    <div class="layui-tab-item">
+                        <table class="layui-table" id="exportParam-table" lay-filter="role-table"></table>
+                    </div>
+                    <div class="layui-tab-item">
+                        <table class="layui-table" id="tablesParam-table" lay-filter="role-table"></table>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <button class="layui-btn layui-btn-primary close" type="button">取消</button>
+                <button class="layui-btn" lay-filter="role-form-submit" lay-submit>保存</button>
+            </div>
+        </form>
+    </div>
+</script>
+
+<!-- 表格操作列 -->
+<script type="text/html" id="function-table-bar">
+    <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="read">查看</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</script>
+
+<script>
+    layui.use(['table'], function () {
+        var table = layui.table;
+
+        //渲染表格
+        table.render({
+            elem: '#function-table',
+            url: 'sap/function/list',
+            cols: [
+                [
+                    {type: 'numbers'},
+                    {field: 'functionName', title: '接口'},
+                    {field: 'description', title:'描述'},
+                    {toolbar: '#function-table-bar', title: '操作', align: 'center'}
+                ]
+            ]
+        });
+
+        var importParams = [];
+        table.render({
+            elem: '#importParam-table',
+            data: importParams,
+            cols: [
+                [
+                    {type: 'numbers'},
+                    {field: 'functionName', title: '参数名称'},
+                    {field: 'description', title:'type'},
+                    {toolbar: '#function-table-bar', title: '操作', align: 'center'}
+                ]
+            ]
+        });
+
+        var exportParams = [];
+        table.render({
+            elem: '#exportParam-table',
+            data: exportParams,
+            cols: [
+                [
+                    {type: 'numbers'},
+                    {field: 'functionName', title: '接口'},
+                    {field: 'description', title:'描述'},
+                    {toolbar: '#function-table-bar', title: '操作', align: 'center'}
+                ]
+            ]
+        });
+
+        var tablsParams = [];
+        table.render({
+            elem: '#tablesParam-table',
+            data: tablsParams,
+            cols: [
+                [
+                    {type: 'numbers'},
+                    {field: 'functionName', title: '接口'},
+                    {field: 'description', title:'描述'},
+                    {toolbar: '#function-table-bar', title: '操作', align: 'center'}
+                ]
+            ]
+        });
+
+        //添加按钮点击事件
+        $('#function-btn-add').click(function() {
+            showAddModel();
+            // queryFunctionParams();
+        });
+
+        // 显示添加弹窗
+        var showAddModel = function () {
+            layer.open({
+                type: 1,
+                title: '添加',
+                area: '750px',
+                offset: '120px',
+                anim: 1,
+                content: $('#function-model').html(),
+                success: function () {
+                    // $('#function-form')[0].reset();
+                    // formUrl = 'sap/function/add';
+                    //
+                    // $('#function-form .close').click(function () {
+                    //     layer.closeAll('page');
+                    // });
+                }
+            });
+        };
+
+        //function信息import、export、table参数查询
+        var queryFunctionParams = function(functionName) {
+            layer.load(1);
+            $.post('sap/function/queryFunctionParams', {
+                functionName : $("input [name='functionName']").val()
+            }, function (data) {
+                layer.closeAll('loading');
+                if (200 == data.code) {
+                    layer.msg(data.msg, {icon: 1});
+                } else {
+                    layer.msg(data.msg, {icon: 2});
+                }
+            }, 'json');
+        };
+    })
+</script>

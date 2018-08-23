@@ -1,0 +1,10 @@
+<ZSD_EIF_VBSN>
+    <INPUT>
+        <AESKD></AESKD>
+        <POSNR>000000</POSNR>
+        <VBELN></VBELN>
+    </INPUT>
+    <OUTPUT>
+        <L_SUBRC>0</L_SUBRC>
+    </OUTPUT>
+</ZSD_EIF_VBSN>
